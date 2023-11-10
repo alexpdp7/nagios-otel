@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "nagios-otel"
+version = "0.1.0"
+description = ""
+authors = ["alex <alex@pdp7.net>"]
+readme = "README.md"
+packages = [{include = "nagios_otel"}]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+opentelemetry-exporter-otlp = "^1.21.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
