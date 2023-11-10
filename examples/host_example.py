@@ -10,7 +10,11 @@ if __name__ == "__main__":
 
     for line in pathlib.Path(sys.argv[2]).read_text().splitlines():
         print(line)
-        perf_data = perfdata.parse_host_perfdata(line)
+        try:
+            perf_data = perfdata.parse_host_perfdata(line)
+        except Exception as e:
+            print(e)
+            continue
         for metric in perf_data.perfdata:
             if metric.label == "rta":
                 assert metric.uom == "ms"
