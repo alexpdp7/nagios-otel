@@ -1,0 +1,20 @@
+import pathlib
+import sys
+
+from nagios_otel import otel, perfdata
+
+
+if __name__ == "__main__":
+    metric_exporter = otel.create_grpc_metric_exporter(sys.argv[1], True)
+    batcher = otel.MetricBatcher(metric_exporter)
+
+    for line in pathlib.Path(sys.argv[2]).read_text().splitlines():
+        print(line)
+        perf_data = perfdata.parse_host_perfdata(line)
+        for metric in perf_data.perfdata:
+            if metric.label == "rta":
+                assert metric.uom == "ms"
+                batcher.record_gauge(perf_data.timestamp, perf_data.host, "system.network.ping", int(metric.value * 1000), "ns")
+                batcher.record_gauge(perf_data.timestamp, perf_data.host, "system.network.ping.warn", int(float(metric.warn) * 1000), "ns")
+                batcher.record_gauge(perf_data.timestamp, perf_data.host, "system.network.ping.crit", int(float(metric.crit) * 1000), "ns")
+    batcher.batch()
