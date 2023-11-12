@@ -29,7 +29,7 @@ class MetricBatcher:
             self.resource_metric_to_datapoints[resource_metric] = []
         self.resource_metric_to_datapoints[resource_metric].append(NumberDataPoint(None, None, int(timestamp.timestamp() * 10**9), value))
 
-    def batch(self):
+    def batch(self, debug_noop=False):
         instrumentation_scope = InstrumentationScope("nagios_otel", "0")
         for resource_metric, datapoints in self.resource_metric_to_datapoints.items():
             resource = resource_metric.resource
@@ -40,6 +40,9 @@ class MetricBatcher:
             scope_metricss = [ScopeMetrics(instrumentation_scope, metrics, None)]
             resource_metricss = [ResourceMetrics(resource, scope_metricss, None)]
             metrics_data = MetricsData(resource_metricss)
+            if debug_noop:
+                print(resource.attributes["host.name"], metrics_data)
+                continue
             self.exporter.export(metrics_data)
 
 
