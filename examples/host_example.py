@@ -24,8 +24,8 @@ if __name__ == "__main__":
                 batcher.record_gauge(perf_data.timestamp, perf_data.host, "system.network.ping.crit", int(float(metric.crit) * 1000), "ns")
             if metric.label == "pl":
                 assert metric.uom == "%"
-                batcher.record_gauge(perf_data.timestamp, perf_data.host, "system.network.ping.packet-loss", metric.value, "%")
-                batcher.record_gauge(perf_data.timestamp, perf_data.host, "system.network.ping.packet-loss.warn", metric.warn, "%")
-                batcher.record_gauge(perf_data.timestamp, perf_data.host, "system.network.ping.packet-loss.crit", metric.crit, "%")
+                batcher.record_gauge(perf_data.timestamp, perf_data.host, "system.network.ping.packet-loss", int(metric.value), "%")
+                batcher.record_gauge(perf_data.timestamp, perf_data.host, "system.network.ping.packet-loss.warn", int(metric.warn), "%")
+                batcher.record_gauge(perf_data.timestamp, perf_data.host, "system.network.ping.packet-loss.crit", int(metric.crit), "%")
     batcher.batch()
     file.unlink()
