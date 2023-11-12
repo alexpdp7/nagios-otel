@@ -5,6 +5,47 @@ import sys
 from nagios_otel import otel, perfdata
 
 
+"""
+If you send this data to ClickHouse using:
+
+https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/exporter/clickhouseexporter
+
+, you can simplify usage of the filesystem usage metrics with the following view:
+
+CREATE VIEW mountpoint_usage AS
+SELECT
+    ResourceAttributes['host.name'] AS host,
+    Attributes['system.filesystem.mountpoint'] AS mountpoint,
+    TimeUnix,
+    anyIf(Value, (Attributes['system.filesystem.state']) = 'free') AS free,
+    anyIf(Value, (Attributes['system.filesystem.state']) = 'used') AS used,
+    anyIf(Value, (Attributes['system.filesystem.state']) = 'free') + anyIf(Value, (Attributes['system.filesystem.state']) = 'used') AS total
+FROM otel_metrics_gauge
+WHERE MetricName = 'system.filesystem.usage'
+GROUP BY
+    ResourceAttributes['host.name'],
+    Attributes['system.filesystem.mountpoint'],
+    TimeUnix
+
+, which makes creating queries such as:
+
+SELECT
+    host,
+    mountpoint,
+    first_value(free) AS free,
+    first_value(used) AS used,
+    first_value(total) AS total,
+    free / total AS pct_free,
+    first_value(TimeUnix) AS when
+FROM otel.mountpoint_usage
+GROUP BY
+    host,
+    mountpoint
+
+simpler.
+"""
+
+
 if __name__ == "__main__":
     metric_exporter = otel.create_grpc_metric_exporter(sys.argv[1], True)
     batcher = otel.MetricBatcher(metric_exporter)
