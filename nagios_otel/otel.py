@@ -21,13 +21,13 @@ class MetricBatcher:
         self.exporter = exporter
         self.resource_metric_to_datapoints = dict()
 
-    def record_gauge(self, timestamp: datetime.datetime, host: str, metric: str, value: int, unit: str):
+    def record_gauge(self, timestamp: datetime.datetime, host: str, metric: str, value: int, unit: str, metric_attributes: dict=None):
         resource = Resource({"host.name": host})
         metric_name = metric
         resource_metric = ResourceMetric(resource, metric_name, unit)
         if resource_metric not in self.resource_metric_to_datapoints:
             self.resource_metric_to_datapoints[resource_metric] = []
-        self.resource_metric_to_datapoints[resource_metric].append(NumberDataPoint(None, None, int(timestamp.timestamp() * 10**9), value))
+        self.resource_metric_to_datapoints[resource_metric].append(NumberDataPoint(metric_attributes, None, int(timestamp.timestamp() * 10**9), value))
 
     def batch(self, debug_noop=False):
         instrumentation_scope = InstrumentationScope("nagios_otel", "0")
