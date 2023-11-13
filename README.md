@@ -39,3 +39,7 @@ In the example above:
 * Install this package to the virtualenv.
 
 This example uses the [`host_example.py`](examples/host_example.py) script that only processes the `rta` metric from the `check_ping` monitoring plugin.
+
+# Others
+
+* [How to parse `nagios.log` with the OpenTelemetry Collector](https://github.com/alexpdp7/alexpdp7/blob/aa7b9fd9c65de8ef30bfd63e23c7e47420aa8053/personal_infra/puppet/site/nagios.h1.int.pdp7.net.pp#L26).
